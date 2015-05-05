@@ -7,13 +7,32 @@ object Text {
    * Hyphens and underscores are used as delimiters and will be removed from the result.
    * Each substring a part of the first one is only capitalized - no other case conversions are applied.
    *
-   * @param s String
+   * @param input String
    * @return String
    */
-  def toLowerCamelCase(s: String): String = {
-    val chars = s.replace('-', '_').split('_')
-    chars.tail.foldLeft(chars.head)((s1, s2) => s1 + s2.capitalize)
+  def toLowerCamelCase(input: String): String = {
+    val words = input.trim.replace('-', '_').split('_').filter(!_.isEmpty)
+    words.headOption.fold("") { firstWord =>
+      (firstLetterLowerCase(firstWord) +: words.tail.map(_.capitalize)).mkString
+    }
   }
+
+
+
+  /** Returns the string with first character converted to lower case.
+    * If the first character of the string is lowercase, it is returned unchanged.
+    * Shameless copy of scala.collection.immutable.StringLike#capitalize with change toLower
+    */
+  def firstLetterLowerCase(input: String): String =
+    if (input == null) null
+    else if (input.length == 0) ""
+    else if (input.charAt(0).isLower) input
+    else {
+      val chars = input.toCharArray
+      chars(0) = chars(0).toLower
+      new String(chars)
+    }
+
 
   /**
    * Converts given string to upper camel case format, e.g. "upper_camel' -> "UpperCamel".
